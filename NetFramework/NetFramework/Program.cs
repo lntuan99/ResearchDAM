@@ -13,7 +13,7 @@ namespace NetFramework
     {
         static void Main(string[] args)
         {
-           /* Console.WriteLine("================ Attribute ================\n");
+            Console.WriteLine("================ Attribute ================\n");
             Atrributes();
             TestAtrributeReader();
             Console.WriteLine("================ Attribute ================\n");
@@ -21,7 +21,7 @@ namespace NetFramework
             Console.WriteLine("============ DBProviderFactory =============\n");
             DBProviderFactory();
             Console.WriteLine("============ DBProviderFactory =============\n");
-*/
+
             Console.WriteLine("======== IDBConnectionICommandIReader =======\n");
             IDBConnectionICommandIReader();
             Console.WriteLine("======== IDBConnectionICommandIReader =======\n");
