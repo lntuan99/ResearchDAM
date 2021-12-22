@@ -13,7 +13,7 @@ namespace NetFramework
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("================ Attribute ================\n");
+           /* Console.WriteLine("================ Attribute ================\n");
             Atrributes();
             TestAtrributeReader();
             Console.WriteLine("================ Attribute ================\n");
@@ -21,7 +21,7 @@ namespace NetFramework
             Console.WriteLine("============ DBProviderFactory =============\n");
             DBProviderFactory();
             Console.WriteLine("============ DBProviderFactory =============\n");
-
+*/
             Console.WriteLine("======== IDBConnectionICommandIReader =======\n");
             IDBConnectionICommandIReader();
             Console.WriteLine("======== IDBConnectionICommandIReader =======\n");
@@ -119,18 +119,18 @@ namespace NetFramework
 
         public interface IEntityMapper
         {
-            object Map(IDataRecord record);
+            object Map(IDataReader r);
         }
 
         public class TestMapper : IEntityMapper
         {
-            public object Map(IDataRecord record)
+            public object Map(IDataReader r)
             {
                 var test = new Test();
 
-                test.ID = (int)record["ID"];
-                test.Name = record["name"].ToString();
-                test.Code = record["code"].ToString();
+                test.ID = r.GetInt32(0);
+                test.Name = r.GetString(1);
+                test.Code = r.GetString(2);
 
                 return test;
             }
@@ -140,28 +140,26 @@ namespace NetFramework
         {
             var mapper = new TestMapper();
 
-            // More information https://docs.microsoft.com/en-us/dotnet/framework/data/adonet/data-providers
-            DbProviderFactory factory = DbProviderFactories.GetFactory("System.Data.SqlClient");
+            IDbConnection connection = new System.Data.SqlClient.SqlConnection();
 
-            using (var connection = factory.CreateConnection())
+            connection.ConnectionString = CONNECTION_STRING;
+            connection.Open();
+
+            // Create command.
+            IDbCommand baseCmd = connection.CreateCommand();
+            baseCmd.CommandText = "SELECT * FROM test";
+
+            using (var reader = baseCmd.ExecuteReader())
             {
-                connection.ConnectionString = CONNECTION_STRING;
-                connection.Open();
+                while (reader.Read())
+                {
+                    Test test = (Test)mapper.Map(reader);
 
-                // Create command.
-                DbCommand baseCmd = connection.CreateCommand(); 
-                baseCmd.CommandText = "SELECT * FROM test";
-
-                using (var reader = baseCmd.ExecuteReader()) {
-                    while (reader.Read())
-                    {
-                        Test test = (Test)mapper.Map(reader);
-
-                        test.PrintInfo();
-                    }
+                    test.PrintInfo();
                 }
-
             }
+
+            connection.Close();
         }
 
         public static void DBProviderFactory()
